@@ -5,8 +5,6 @@ nav_order: 2
 
 # 軸別ビュー
 
-**前提となる用語：** [Skill、環境との接続、開発標準資産](../guide/ai-development.md)、[MR・PR、CI、ブランチ保護、WBS、請負と準委任、帰属ルール](../guide/terms.md)
-
 各軸がレベルごとにどう変わるかを読むためのページです。「この軸で次に何を整備するか」を決めるときに使います。判定に使う基準は[軸別チェックリスト](../checklist/index.md)にあります。
 
 ## Agent Skill
