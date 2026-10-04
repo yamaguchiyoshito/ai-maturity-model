@@ -1,0 +1,25 @@
+{
+  "name": "ai-maturity-model",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "docs:generate": "python3 tools/build_pages.py",
+    "docs:check": "python3 tools/build_pages.py --check && python3 tools/selftest.py",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "node tools/build_docs.mjs",
+    "docs:preview": "vitepress preview docs --port 4173",
+    "test:site": "node tools/check_site.mjs",
+    "test": "npm run docs:build && npm run test:site"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.58.2",
+    "vitepress": "1.6.4"
+  },
+  "overrides": {
+    "vite": "6.4.3"
+  }
+}

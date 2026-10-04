@@ -1,0 +1,8 @@
+node_modules/
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+artifacts/
+maturity-out/
+__pycache__/
+*.pyc
+.DS_Store

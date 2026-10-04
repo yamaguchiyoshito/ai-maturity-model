@@ -1,0 +1,45 @@
+name: Validate documentation
+on:
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: root
+            base: /
+          - label: project
+            base: /preview-repository/
+    env:
+      SITE_BASE_PATH: ${{ matrix.base }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: 正本との一致検査、自己テスト、サイト生成
+        run: npm run docs:build
+      - name: 生成したサイトの検証
+        run: npm run test:site
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: documentation-${{ matrix.label }}
+          path: artifacts/
+          retention-days: 14
