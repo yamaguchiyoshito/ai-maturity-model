@@ -5,8 +5,6 @@ nav_order: 2
 
 # Skillの使い方：ai-maturity-assessor
 
-**前提となる用語：** [Agent Skill、AIエージェント](../guide/ai-development.md)、[確定、暫定上限、要ヒアリング](../model/rules.md)、[評価の進め方](howto.md)の手順1
-
 指定したリポジトリを走査し、評価の下書きを証拠付きで作るAgent Skillです。`skills/ai-maturity-assessor/` にあります。
 
 このSkillは、[AIを含む開発とは](../guide/ai-development.md)で説明した「ファイルに書いた手順書」そのものです。Claude Code のようなAIエージェントにこの手順書を読ませると、エージェントが評価対象のリポジトリを読み、同梱のスクリプトを実行し、基準との照合結果を報告書の形で書き出します。評価者はその下書きを出発点に、ヒアリングと確定を行います。Skillが行うのは[評価の進め方](howto.md)の手順1だけです。

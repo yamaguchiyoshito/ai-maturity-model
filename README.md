@@ -78,7 +78,7 @@ npm run docs:preview
 | `test:site` | 生成したHTMLのページ数・リンク・アンカーを検査し、ブラウザで表示・検索・モバイル表示を確認する |
 | `docs:preview` | 生成したサイトをローカルで配信する |
 
-文書は、AIを含む開発に不慣れな読者がサイドバーの上から順に読んで理解できるように構成しています。各ページの冒頭に「前提となる用語」、末尾に「次に読む」を置き、説明には架空の「販売管理システム更改PJ」を一貫して使います。ナビゲーションは各ページの front matter（`title`、`nav_order`）から組み立てます。ページを追加するときは、節のディレクトリに `title` と `nav_order` を持つMarkdownを置きます。生成物（`docs/.vitepress/dist/`、`artifacts/`）と `node_modules` はコミットしません。
+文書は、AIを含む開発に不慣れな読者がサイドバーの上から順に読んで理解できるように構成しています。各ページの末尾に「次に読む」を置き、説明には架空の「販売管理システム更改PJ」を一貫して使います。ナビゲーションは各ページの front matter（`title`、`nav_order`）から組み立てます。ページを追加するときは、節のディレクトリに `title` と `nav_order` を持つMarkdownを置きます。生成物（`docs/.vitepress/dist/`、`artifacts/`）と `node_modules` はコミットしません。
 
 ## 公開する（GitHub Pages）
 

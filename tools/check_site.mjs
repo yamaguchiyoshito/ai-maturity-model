@@ -65,7 +65,6 @@ try {
   await expect(page.locator('.VPSidebarItem.level-0 .text').first()).toHaveText('ホーム');
   await expect(page.locator('.VPSidebarItem.level-0').nth(1).locator('h2.text')).toHaveText('はじめに');
   await expect(page.locator('.pager-link.next .title')).toHaveText('開発の基本用語');
-  await expect(page.locator('.vp-doc').getByText('前提となる用語：')).toBeVisible();
   await page.goto(url + 'guide/terms.html#契約と収支'); await page.reload();
   await expect(page.locator('[id="契約と収支"]')).toBeVisible();
   await page.goto(url + 'guide/overview.html');
