@@ -101,7 +101,17 @@ def main():
         if "--write-sample" in sys.argv and not fails:
             body = report.replace(str(repo), "sample-pj")
             head = "---\ntitle: 報告書の例\nnav_order: 3\n---\n\n<!-- tools/selftest.py --write-sample が生成します。 -->\n\n"
-            SAMPLE.write_text(head + body, encoding="utf-8")
+            guide = (
+                "**前提となる用語：** [確定、暫定上限、要ヒアリング](../model/rules.md)、[統制不足](../model/automation.md)、"
+                "[Skillの使い方](skill.md)\n\n"
+                "**この報告書の読み方**：これは[Skill](skill.md)がダミーのリポジトリから自動生成した評価下書きです。"
+                "次の順で読みます。(1) 判定概要で、確定レベルと暫定上限の差を見る。差が大きいほど、リポジトリの外に証拠がある基準が多い。"
+                "(2) 統制状態で、自動化がレベルを超えていないかを見る。(3) 次のレベルへの差分で、制約になっている軸から順に、"
+                "未充足（×）と要ヒアリング（？）の基準を見る。(4) ヒアリング事項の表を使って、PMとPLに確認する。"
+                "記号の意味は、○ 充足、× 未充足、？ 要ヒアリングです。\n\n"
+            )
+            title, rest = body.split("\n", 1)  # 読み方の案内は見出しの直後に置く
+            SAMPLE.write_text(head + title + "\n\n" + guide + rest.lstrip("\n"), encoding="utf-8")
             print(f"[OK] {SAMPLE.relative_to(ROOT)} を更新しました")
 
     if fails:

@@ -22,13 +22,14 @@ SI受託開発におけるAI利用の成熟度を、PJ単位で評価するた�
 ├── skills/
 │   └── ai-maturity-assessor/  評価下書きを作るAgent Skill
 ├── docs/                    文書の正本（Markdown）。GitHub Pagesのサイトを生成する
-│   ├── index.md             ホーム（早見表、読者別の入口）
+│   ├── index.md             ホーム（読む順、目的別の入口、早見表）
+│   ├── guide/               はじめに：AIを含む開発とは、開発の基本用語、なぜ測るのか、モデルの全体像
 │   ├── model/               レベル別ビュー、軸別ビュー、自動化段階、判定規則
+│   ├── assess/              評価の進め方、Skillの使い方、報告書の例【生成】
 │   ├── checklist/           【生成】軸別チェックリスト
 │   ├── process/             【生成】工程別チェックリスト
 │   ├── effect/              効果の目安、算定式、全社集計
-│   ├── assess/              評価の進め方、Skillの使い方、報告書の例【生成】
-│   ├── appendix/            背景、CMMIとの対応、用語集、改訂履歴
+│   ├── appendix/            CMMIとの対応、用語集、改訂履歴
 │   ├── .vitepress/          サイト設定（ナビゲーション、日本語検索、テーマ）
 │   └── public/assets/       公開する静的アセット
 ├── package.json / .nvmrc    実行コマンド、固定した依存関係、Node.jsの版
@@ -77,7 +78,7 @@ npm run docs:preview
 | `test:site` | 生成したHTMLのページ数・リンク・アンカーを検査し、ブラウザで表示・検索・モバイル表示を確認する |
 | `docs:preview` | 生成したサイトをローカルで配信する |
 
-ナビゲーションは各ページの front matter（`title`、`nav_order`）から組み立てます。ページを追加するときは、節のディレクトリに `title` と `nav_order` を持つMarkdownを置きます。生成物（`docs/.vitepress/dist/`、`artifacts/`）と `node_modules` はコミットしません。
+文書は、AIを含む開発に不慣れな読者がサイドバーの上から順に読んで理解できるように構成しています。各ページの冒頭に「前提となる用語」、末尾に「次に読む」を置き、説明には架空の「販売管理システム更改PJ」を一貫して使います。ナビゲーションは各ページの front matter（`title`、`nav_order`）から組み立てます。ページを追加するときは、節のディレクトリに `title` と `nav_order` を持つMarkdownを置きます。生成物（`docs/.vitepress/dist/`、`artifacts/`）と `node_modules` はコミットしません。
 
 ## 公開する（GitHub Pages）
 
