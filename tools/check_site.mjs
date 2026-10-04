@@ -59,6 +59,19 @@ try {
   await expect(page.locator('.vp-doc code', { hasText: 'SK-1-01' }).first()).toBeVisible();
   results.checks.push('deep links, anchor navigation, refresh and generated checklist tables');
 
+  // 読む順路：はじめに → モデル。サイドバーの最初の節が「はじめに」で、前後ページのリンクが順路に従うこと
+  await page.goto(url + 'guide/ai-development.html');
+  await expect(page.locator('h1')).toHaveText('AIを含む開発とは');
+  await expect(page.locator('.VPSidebarItem.level-0 .text').first()).toHaveText('ホーム');
+  await expect(page.locator('.VPSidebarItem.level-0').nth(1).locator('h2.text')).toHaveText('はじめに');
+  await expect(page.locator('.pager-link.next .title')).toHaveText('開発の基本用語');
+  await expect(page.locator('.vp-doc').getByText('前提となる用語：')).toBeVisible();
+  await page.goto(url + 'guide/terms.html#契約と収支'); await page.reload();
+  await expect(page.locator('[id="契約と収支"]')).toBeVisible();
+  await page.goto(url + 'guide/overview.html');
+  await expect(page.locator('.pager-link.next .title')).toHaveText('モデル');
+  results.checks.push('reading order: guide section first, prev/next follows it, glossary anchors');
+
   await page.goto(url + 'process/');
   await expect(page.locator('.VPSidebar').getByRole('link', { name: '要件整理', exact: true })).toBeVisible();
   await page.locator('.VPSidebar').getByRole('link', { name: '要件整理', exact: true }).click();
