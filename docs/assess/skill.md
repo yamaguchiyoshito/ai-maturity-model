@@ -74,5 +74,3 @@ python scripts/score_and_render.py /path/to/repo --project "〇〇システム"
 
 - 証拠候補の検出パターンは初期版です。CIやエージェント設定の構成によっては、候補が見つからない場合があります。その場合もAIがリポジトリを探索して証拠を記録できます。
 - 基準を変更する場合は `criteria/criteria.json` を編集し、`python tools/build_pages.py` を実行します。
-
-**次に読む：** [報告書の例](sample-report.md)で、Skillが出力する下書きの形と読み方を確認します。
