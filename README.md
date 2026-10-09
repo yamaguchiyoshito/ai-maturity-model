@@ -12,9 +12,10 @@ SI受託開発におけるAI利用の成熟度を、PJ単位で評価するた�
 .
 ├── criteria/
 │   ├── criteria.json        判定基準の正本（軸別、55件）
-│   └── process.json         工程別チェックリストの正本（9工程、119項目）
+│   ├── process.json         工程別チェックリストの正本（9工程、119項目）
+│   └── model.json           成熟度マトリクスの正本（軸×レベルの状態、自動化段階、効果の目安）
 ├── tools/
-│   ├── build_pages.py       正本 → チェックリストのページとSkill同梱の基準を生成
+│   ├── build_pages.py       正本 → チェックリストのページ、成熟度マトリクス、Skill同梱の基準を生成
 │   ├── selftest.py          Skillの自己テスト、報告書の例の生成
 │   ├── build_docs.mjs       一致検査、自己テスト、静的サイト生成を順に実行
 │   ├── check_html.py        生成したHTMLのページ数・リンク・アンカーの検査
@@ -24,7 +25,7 @@ SI受託開発におけるAI利用の成熟度を、PJ単位で評価するた�
 ├── docs/                    文書の正本（Markdown）。GitHub Pagesのサイトを生成する
 │   ├── index.md             ホーム（読む順、目的別の入口、早見表）
 │   ├── guide/               はじめに：AIを含む開発とは、開発の基本用語、なぜ測るのか、成熟度モデルの全体像
-│   ├── model/               レベル別ビュー、軸別ビュー、自動化段階、判定規則
+│   ├── model/               レベル別ビュー、軸別ビュー、自動化段階、判定規則、成熟度マトリクス【生成】
 │   ├── assess/              評価の進め方、Skillの使い方、報告書の例【生成】
 │   ├── checklist/           【生成】軸別チェックリスト
 │   ├── process/             【生成】工程別チェックリスト
@@ -40,10 +41,10 @@ SI受託開発におけるAI利用の成熟度を、PJ単位で評価するた�
 
 ## 基準を変更する
 
-基準の正本は `criteria/` の2ファイルだけです。`docs/checklist/`、`docs/process/`、`skills/ai-maturity-assessor/references/criteria.json` は生成物なので、手で編集しません。
+基準と成熟度マトリクスの正本は `criteria/` の3ファイル（`criteria.json`、`process.json`、`model.json`）だけです。`docs/checklist/`、`docs/process/`、`docs/model/matrix.md`、`skills/ai-maturity-assessor/references/criteria.json` は生成物なので、手で編集しません。
 
 ```bash
-# 1. criteria/criteria.json または criteria/process.json を編集する
+# 1. criteria/criteria.json、criteria/process.json、criteria/model.json のいずれかを編集する
 # 2. 生成する
 npm run docs:generate
 # 3. 確認する
