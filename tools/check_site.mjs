@@ -40,7 +40,7 @@ try {
 
   await page.goto(url);
   await expect(page.locator('h1')).toHaveText('SI受託開発のAI利用成熟度モデル');
-  await expect(page.locator('.VPNavBarMenu').getByRole('link', { name: 'モデル', exact: true })).toBeVisible();
+  await expect(page.locator('.VPNavBarMenu').getByRole('link', { name: '成熟度モデル', exact: true })).toBeVisible();
   await expect(page.locator('.VPSidebar').getByRole('link', { name: '軸別チェックリスト', exact: true })).toBeVisible();
   await mkdir('artifacts', { recursive: true });
   await page.screenshot({ path: 'artifacts/home-desktop.png', fullPage: true });
@@ -59,7 +59,7 @@ try {
   await expect(page.locator('.vp-doc code', { hasText: 'SK-1-01' }).first()).toBeVisible();
   results.checks.push('deep links, anchor navigation, refresh and generated checklist tables');
 
-  // 読む順路：はじめに → モデル。サイドバーの最初の節が「はじめに」で、前後ページのリンクが順路に従うこと
+  // 読む順路：はじめに → 成熟度モデル。サイドバーの最初の節が「はじめに」で、前後ページのリンクが順路に従うこと
   await page.goto(url + 'guide/ai-development.html');
   await expect(page.locator('h1')).toHaveText('AIを含む開発とは');
   await expect(page.locator('.VPSidebarItem.level-0 .text').first()).toHaveText('ホーム');
@@ -68,7 +68,7 @@ try {
   await page.goto(url + 'guide/terms.html#契約と収支'); await page.reload();
   await expect(page.locator('[id="契約と収支"]')).toBeVisible();
   await page.goto(url + 'guide/overview.html');
-  await expect(page.locator('.pager-link.next .title')).toHaveText('モデル');
+  await expect(page.locator('.pager-link.next .title')).toHaveText('成熟度モデル');
   results.checks.push('reading order: guide section first, prev/next follows it, glossary anchors');
 
   await page.goto(url + 'process/');
