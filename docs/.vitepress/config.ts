@@ -52,7 +52,7 @@ export default defineConfig({
   lang: 'ja-JP',
   title: 'SI受託開発のAI利用成熟度モデル',
   titleTemplate: ':title | AI利用成熟度モデル',
-  description: 'PJ単位でAI利用の成熟度を評価し、制約工程の特定と効果測定に使うためのモデル',
+  description: 'PJ単位でAI利用の成熟度を評価し、制約工程の特定と効果測定に使うための成熟度モデル',
   base,
   cleanUrls: false,
   appearance: true,

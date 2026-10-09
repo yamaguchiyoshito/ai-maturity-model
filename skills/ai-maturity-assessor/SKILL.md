@@ -92,4 +92,4 @@ python scripts/score_and_render.py <repo> --project "<PJ名>"
 - 統制不足：自動化段階が暫定上限をも超える場合は「確定」、確定レベルだけを超える場合は「疑い」。
 - レベル4・5はPJ単独では判定しない。
 
-モデルの定義は `references/model.md`、基準の全量は `references/criteria.json` を参照する。基準の追加・変更は `criteria.json` だけで行う。
+成熟度モデルの定義は `references/model.md`、基準の全量は `references/criteria.json` を参照する。基準の追加・変更は `criteria.json` だけで行う。
