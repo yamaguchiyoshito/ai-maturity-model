@@ -71,6 +71,38 @@ try {
   await expect(page.locator('.pager-link.next .title')).toHaveText('成熟度モデル');
   results.checks.push('reading order: guide section first, prev/next follows it, glossary anchors');
 
+  // 成熟度マトリクス：セル選択で PJ のレベル（5軸の最小値）と統制不足を判定し、再読み込み後も選択が残ること
+  await page.goto(url + 'model/matrix.html');
+  await expect(page.locator('h1')).toHaveText('成熟度マトリクス');
+  await expect(page.locator('.VPSidebar').getByRole('link', { name: '成熟度マトリクス', exact: true })).toBeVisible();
+  await expect(page.locator('.mm-matrix')).toHaveCount(3);
+  await expect(page.locator('.mm-summary')).toBeVisible();
+  await expect(page.locator('.mm-matrix-axes tbody tr[data-axis]')).toHaveCount(5);
+  const pick = async (axis, level) => page.locator(`.mm-matrix-axes tr[data-axis="${axis}"] td.mm-cell[data-level="${level}"] .mm-state`).click(); // セル中央は折りたたみ見出しに当たりうるため、状態文を押す
+  await pick('SK', 2); await pick('ENV', 2); await pick('STD', 2); await pick('PRC', 1); await pick('EST', 2);
+  await expect(page.locator('[data-testid="mm-pj-level"]')).toHaveText('レベル1 属人的');
+  await expect(page.locator('[data-testid="mm-constraint"]')).toContainText('AI前提の開発プロセス');
+  await expect(page.locator('[data-testid="mm-effect"]')).toContainText('10〜20%');
+  await page.locator('.mm-matrix-stages td.mm-stage-cell[data-stage="A3"] .mm-state').click();
+  await expect(page.locator('[data-testid="mm-control-excess"]')).toBeVisible();
+  await expect(page.locator('[data-testid="mm-control-excess"]')).toContainText('レベル3以上');
+  await page.locator('.mm-matrix-stages td.mm-stage-cell[data-stage="A1"] .mm-state').click();
+  await expect(page.locator('[data-testid="mm-control-ok"]')).toContainText('A1');
+  await expect(page.locator('.mm-matrix-levels thead th.is-current')).toHaveText(/レベル1/);
+  await page.locator('#mm-target').fill('販売管理PJ'); await page.locator('#mm-target').dispatchEvent('change');
+  await page.reload();
+  await expect(page.locator('[data-testid="mm-pj-level"]')).toHaveText('レベル1 属人的');
+  await expect(page.locator('.mm-matrix-axes tr[data-axis="PRC"] td.mm-cell[data-level="1"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('[data-testid="mm-markdown"]')).toContainText('販売管理PJ');
+  await expect(page.locator('[data-testid="mm-markdown"]')).toContainText('| AI前提の開発プロセス | レベル1 属人的 |');
+  await pick('PRC', 1); // 再クリックで解除され、暫定になる
+  await expect(page.locator('[data-testid="mm-pj-level"]')).toHaveText('レベル2 プロセス確立');
+  page.once('dialog', d => d.accept());
+  await page.getByRole('button', { name: 'リセット' }).click();
+  await expect(page.locator('[data-testid="mm-pj-level"]')).toHaveText('未選択');
+  await expect(page.locator('.mm-matrix-axes td.mm-cell[aria-pressed="true"]')).toHaveCount(0);
+  results.checks.push('maturity matrix: selection, PJ level = min of axes, control excess, persistence, reset');
+
   await page.goto(url + 'process/');
   await expect(page.locator('.VPSidebar').getByRole('link', { name: '要件整理', exact: true })).toBeVisible();
   await page.locator('.VPSidebar').getByRole('link', { name: '要件整理', exact: true }).click();
@@ -111,6 +143,12 @@ try {
   if (overflow) throw Error('Horizontal page overflow on mobile');
   await page.screenshot({ path: 'artifacts/checklist-mobile.png', fullPage: true });
   results.checks.push('mobile sidebar and no page overflow');
+
+  await page.goto(url + 'model/matrix.html');
+  await expect(page.locator('.mm-matrix').first()).toBeVisible();
+  if (await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1)) throw Error('Horizontal page overflow on mobile matrix page');
+  await page.screenshot({ path: 'artifacts/matrix-mobile.png', fullPage: false });
+  results.checks.push('mobile matrix scrolls inside the table, not the page');
 
   await page.locator('button.DocSearch-Button').click();
   await page.locator('#localsearch-input').fill('SK-1-01');
