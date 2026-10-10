@@ -111,13 +111,10 @@ def process_page(proc, p, order):
 
 
 MATRIX_INTRO = (
-    "成熟度モデルの全体を一枚で見渡すための表です。[軸別ビュー](axes.md)、[レベル別ビュー](levels.md)、[自動化段階](automation.md)に分かれている定義を、"
-    "行にレベル、列に評価軸を取って並べ直しています。1行が「そのレベルのPJの姿」です。見出し行と行見出しの列は固定され、表が広いときは横にスクロールできます。"
-    "左の目次の上にある「目次を閉じる」で本文の幅を広げると、表全体が収まります。\n\n"
-    "表のセルを選ぶと、その軸の自己評価として記録され、上の集計に[判定規則](rules.md)（PJのレベルは5軸の最小値、自動化段階は前提レベルを超えると統制不足）を当てた結果が表示されます。"
-    "PJのレベルに当たる行は帯で強調されます。記録はこのブラウザのローカルストレージにだけ保存され、サーバーには送られません。\n\n"
-    "**この集計は申告に基づく自己評価です。** 判定規則は自己申告だけでは充足としないため、確定には[評価の進め方](../assess/howto.md)の手順で証拠を確認してください。"
-    "集計のMarkdownは[報告書の例](../assess/sample-report.md)の「軸別レベル」表と同じ形式で、評価下書きの出発点として使えます。\n\n"
+    "成熟度モデルを一枚で見渡す表です。行がレベル、列が評価軸で、1行が「そのレベルのPJの姿」を表します。\n\n"
+    "各軸で現状に最も近いセルを選ぶと、[判定規則](rules.md)（PJのレベルは5軸の最小値、統制不足の有無）に基づく自己評価が上の集計に表示されます。"
+    "記録はこのブラウザにだけ保存されます。\n\n"
+    "**自己評価は申告に基づく暫定です。** 確定には[評価の進め方](../assess/howto.md)の手順で証拠を確認してください。\n\n"
 )
 
 
@@ -188,10 +185,10 @@ def matrix_page(crit, model, order):
 
     # 2. 自動化段階（行＝段階、列＝属性）
     out += "## 自動化段階\n\n"
-    out += "行が段階です。「状態」のセルを選ぶと、実行記録で確認できた最上位の段階として記録されます。各段階の定義と前提レベルは[自動化段階](automation.md)、必須基準は[自動化段階の判定基準](../checklist/automation.md)にあります。\n\n"
+    out += "行が段階です。「状態」のセルを選ぶと、実行記録で確認できた最上位の段階として記録されます。各段階の定義は[自動化段階](automation.md)、必須基準は[自動化段階の判定基準](../checklist/automation.md)にあります。\n\n"
     st_keys = ["0", "A1", "A2", "A3", "A4"]
     out += "<div class=\"mm-matrix-wrap\"><table class=\"mm-matrix mm-matrix-stages\" aria-label=\"自動化段階\">\n"
-    out += "<thead><tr><th scope=\"col\" class=\"mm-row-head\">段階</th><th scope=\"col\">状態</th><th scope=\"col\">具体例（架空PJ）</th><th scope=\"col\" class=\"mm-col-narrow\">前提とするレベル</th><th scope=\"col\">確認する基準</th></tr></thead>\n<tbody>\n"
+    out += "<thead><tr><th scope=\"col\" class=\"mm-row-head\">段階</th><th scope=\"col\">状態</th><th scope=\"col\">具体例（架空PJ）</th><th scope=\"col\">確認する基準</th></tr></thead>\n<tbody>\n"
     for k in st_keys:
         st = stages[k]
         head = html(st["posture"]) if k == "0" else f"{k}<span class=\"mm-lv-name\">{html(st['posture'])}</span>"
@@ -199,8 +196,6 @@ def matrix_page(crit, model, order):
         out += f"<tr data-stage=\"{k}\"><th scope=\"row\" class=\"mm-row-head\">{head}</th>"
         out += f"<td class=\"mm-cell mm-stage-cell\" data-stage=\"{k}\" role=\"button\" tabindex=\"0\" aria-pressed=\"false\" aria-label=\"自動化段階を {name} として記録\"><span class=\"mm-mark\" aria-hidden=\"true\">選択中</span><p class=\"mm-state\">{html(st['state'])}</p></td>"
         out += f"<td>{html(st['example'])}</td>"
-        pre = "—" if k == "0" else f"レベル{st['min_level']}<span class=\"mm-sub\">{html(st['reason'])}</span>"
-        out += f"<td class=\"mm-col-narrow\">{pre}</td>"
         if k == "0":
             req = "—"
         elif st["requires"]:

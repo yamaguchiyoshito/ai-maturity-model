@@ -8,11 +8,11 @@ aside: false
 
 # 成熟度マトリクス
 
-成熟度モデルの全体を一枚で見渡すための表です。[軸別ビュー](axes.md)、[レベル別ビュー](levels.md)、[自動化段階](automation.md)に分かれている定義を、行にレベル、列に評価軸を取って並べ直しています。1行が「そのレベルのPJの姿」です。見出し行と行見出しの列は固定され、表が広いときは横にスクロールできます。左の目次の上にある「目次を閉じる」で本文の幅を広げると、表全体が収まります。
+成熟度モデルを一枚で見渡す表です。行がレベル、列が評価軸で、1行が「そのレベルのPJの姿」を表します。
 
-表のセルを選ぶと、その軸の自己評価として記録され、上の集計に[判定規則](rules.md)（PJのレベルは5軸の最小値、自動化段階は前提レベルを超えると統制不足）を当てた結果が表示されます。PJのレベルに当たる行は帯で強調されます。記録はこのブラウザのローカルストレージにだけ保存され、サーバーには送られません。
+各軸で現状に最も近いセルを選ぶと、[判定規則](rules.md)（PJのレベルは5軸の最小値、統制不足の有無）に基づく自己評価が上の集計に表示されます。記録はこのブラウザにだけ保存されます。
 
-**この集計は申告に基づく自己評価です。** 判定規則は自己申告だけでは充足としないため、確定には[評価の進め方](../assess/howto.md)の手順で証拠を確認してください。集計のMarkdownは[報告書の例](../assess/sample-report.md)の「軸別レベル」表と同じ形式で、評価下書きの出発点として使えます。
+**自己評価は申告に基づく暫定です。** 確定には[評価の進め方](../assess/howto.md)の手順で証拠を確認してください。
 
 <ClientOnly><MatrixAssessment /></ClientOnly>
 
@@ -37,16 +37,16 @@ aside: false
 
 ## 自動化段階
 
-行が段階です。「状態」のセルを選ぶと、実行記録で確認できた最上位の段階として記録されます。各段階の定義と前提レベルは[自動化段階](automation.md)、必須基準は[自動化段階の判定基準](../checklist/automation.md)にあります。
+行が段階です。「状態」のセルを選ぶと、実行記録で確認できた最上位の段階として記録されます。各段階の定義は[自動化段階](automation.md)、必須基準は[自動化段階の判定基準](../checklist/automation.md)にあります。
 
 <div class="mm-matrix-wrap"><table class="mm-matrix mm-matrix-stages" aria-label="自動化段階">
-<thead><tr><th scope="col" class="mm-row-head">段階</th><th scope="col">状態</th><th scope="col">具体例（架空PJ）</th><th scope="col" class="mm-col-narrow">前提とするレベル</th><th scope="col">確認する基準</th></tr></thead>
+<thead><tr><th scope="col" class="mm-row-head">段階</th><th scope="col">状態</th><th scope="col">具体例（架空PJ）</th><th scope="col">確認する基準</th></tr></thead>
 <tbody>
-<tr data-stage="0"><th scope="row" class="mm-row-head">AIを使っていない</th><td class="mm-cell mm-stage-cell" data-stage="0" role="button" tabindex="0" aria-pressed="false" aria-label="自動化段階を 自動化段階なし として記録"><span class="mm-mark" aria-hidden="true">選択中</span><p class="mm-state">AIエージェントを使っていない。または単発の利用にとどまる</p></td><td>AIを使っていないか、チャットで聞いた結果を人が転記している</td><td class="mm-col-narrow">—</td><td>—</td></tr>
-<tr data-stage="A1"><th scope="row" class="mm-row-head">A1<span class="mm-lv-name">手元で動かす</span></th><td class="mm-cell mm-stage-cell" data-stage="A1" role="button" tabindex="0" aria-pressed="false" aria-label="自動化段階を A1 として記録"><span class="mm-mark" aria-hidden="true">選択中</span><p class="mm-state">人が起動し、ローカルで実行・検証する</p></td><td>開発者が自分のPCでAIを起動し、生成とテストをさせ、自分で確認してコミットする</td><td class="mm-col-narrow">レベル1<span class="mm-sub">影響が個人環境に閉じる</span></td><td><a href="../checklist/automation.html"><code>ENV-1-01</code></a> AIエージェントの設定・指示ファイルがある<br><a href="../checklist/automation.html"><code>ENV-1-02</code></a> ビルド・テストのコマンドが定義されている</td></tr>
-<tr data-stage="A2"><th scope="row" class="mm-row-head">A2<span class="mm-lv-name">共有の場につなぐ</span></th><td class="mm-cell mm-stage-cell" data-stage="A2" role="button" tabindex="0" aria-pressed="false" aria-label="自動化段階を A2 として記録"><span class="mm-mark" aria-hidden="true">選択中</span><p class="mm-state">共有リポジトリ・Issue・共有CIに接続し、MRまで作成する</p></td><td>AIがIssueを読んで作業ブランチで変更し、変更の提案（MR・PR）を作る。PLがレビューしてマージする</td><td class="mm-col-narrow">レベル2<span class="mm-sub">権限と人間レビューが定義済みである必要がある</span></td><td><a href="../checklist/automation.html"><code>ENV-2-01</code></a> 共有CIが定義されている<br><a href="../checklist/automation.html"><code>ENV-2-06</code></a> AIがIssue・MR・PRを操作する接続が設定されている</td></tr>
-<tr data-stage="A3"><th scope="row" class="mm-row-head">A3<span class="mm-lv-name">自動で起動する</span></th><td class="mm-cell mm-stage-cell" data-stage="A3" role="button" tabindex="0" aria-pressed="false" aria-label="自動化段階を A3 として記録"><span class="mm-mark" aria-hidden="true">選択中</span><p class="mm-state">サーバサイドで、イベントやスケジュールを契機に実行・検証・記録する</p></td><td>Issueに「AI対応」のラベルが付くと、サーバ上でAIが起動し、変更、CIでの検証、結果の記録まで行う。人は結果を確認する</td><td class="mm-col-narrow">レベル3<span class="mm-sub">無人起動は、強制力のある組織標準の停止設定が前提</span></td><td><a href="../checklist/automation.html"><code>AUTO-3-01</code></a> サーバサイド（CI等）でAIエージェントを実行している<br><a href="../checklist/automation.html"><code>AUTO-3-02</code></a> イベントまたはスケジュールを契機にAIエージェントを起動している</td></tr>
-<tr data-stage="A4"><th scope="row" class="mm-row-head">A4<span class="mm-lv-name">自分で判断して繰り返す</span></th><td class="mm-cell mm-stage-cell" data-stage="A4" role="button" tabindex="0" aria-pressed="false" aria-label="自動化段階を A4 として記録"><span class="mm-mark" aria-hidden="true">選択中</span><p class="mm-state">統制範囲内で、Skillと環境を選択し自律反復する</p></td><td>AIが対象の作業に合うSkillを選び、CIが失敗すれば原因を直して再実行し、通常の範囲を外れたら止まって人に確認する</td><td class="mm-col-narrow">レベル4<span class="mm-sub">停止・再試行条件は、ベースラインがなければ数値化できない</span></td><td>本カタログでは判定しない。レベル4のベースライン（停止・再試行・確認の条件を数値で定めること）が前提</td></tr>
+<tr data-stage="0"><th scope="row" class="mm-row-head">AIを使っていない</th><td class="mm-cell mm-stage-cell" data-stage="0" role="button" tabindex="0" aria-pressed="false" aria-label="自動化段階を 自動化段階なし として記録"><span class="mm-mark" aria-hidden="true">選択中</span><p class="mm-state">AIエージェントを使っていない。または単発の利用にとどまる</p></td><td>AIを使っていないか、チャットで聞いた結果を人が転記している</td><td>—</td></tr>
+<tr data-stage="A1"><th scope="row" class="mm-row-head">A1<span class="mm-lv-name">手元で動かす</span></th><td class="mm-cell mm-stage-cell" data-stage="A1" role="button" tabindex="0" aria-pressed="false" aria-label="自動化段階を A1 として記録"><span class="mm-mark" aria-hidden="true">選択中</span><p class="mm-state">人が起動し、ローカルで実行・検証する</p></td><td>開発者が自分のPCでAIを起動し、生成とテストをさせ、自分で確認してコミットする</td><td><a href="../checklist/automation.html"><code>ENV-1-01</code></a> AIエージェントの設定・指示ファイルがある<br><a href="../checklist/automation.html"><code>ENV-1-02</code></a> ビルド・テストのコマンドが定義されている</td></tr>
+<tr data-stage="A2"><th scope="row" class="mm-row-head">A2<span class="mm-lv-name">共有の場につなぐ</span></th><td class="mm-cell mm-stage-cell" data-stage="A2" role="button" tabindex="0" aria-pressed="false" aria-label="自動化段階を A2 として記録"><span class="mm-mark" aria-hidden="true">選択中</span><p class="mm-state">共有リポジトリ・Issue・共有CIに接続し、MRまで作成する</p></td><td>AIがIssueを読んで作業ブランチで変更し、変更の提案（MR・PR）を作る。PLがレビューしてマージする</td><td><a href="../checklist/automation.html"><code>ENV-2-01</code></a> 共有CIが定義されている<br><a href="../checklist/automation.html"><code>ENV-2-06</code></a> AIがIssue・MR・PRを操作する接続が設定されている</td></tr>
+<tr data-stage="A3"><th scope="row" class="mm-row-head">A3<span class="mm-lv-name">自動で起動する</span></th><td class="mm-cell mm-stage-cell" data-stage="A3" role="button" tabindex="0" aria-pressed="false" aria-label="自動化段階を A3 として記録"><span class="mm-mark" aria-hidden="true">選択中</span><p class="mm-state">サーバサイドで、イベントやスケジュールを契機に実行・検証・記録する</p></td><td>Issueに「AI対応」のラベルが付くと、サーバ上でAIが起動し、変更、CIでの検証、結果の記録まで行う。人は結果を確認する</td><td><a href="../checklist/automation.html"><code>AUTO-3-01</code></a> サーバサイド（CI等）でAIエージェントを実行している<br><a href="../checklist/automation.html"><code>AUTO-3-02</code></a> イベントまたはスケジュールを契機にAIエージェントを起動している</td></tr>
+<tr data-stage="A4"><th scope="row" class="mm-row-head">A4<span class="mm-lv-name">自分で判断して繰り返す</span></th><td class="mm-cell mm-stage-cell" data-stage="A4" role="button" tabindex="0" aria-pressed="false" aria-label="自動化段階を A4 として記録"><span class="mm-mark" aria-hidden="true">選択中</span><p class="mm-state">統制範囲内で、Skillと環境を選択し自律反復する</p></td><td>AIが対象の作業に合うSkillを選び、CIが失敗すれば原因を直して再実行し、通常の範囲を外れたら止まって人に確認する</td><td>本カタログでは判定しない。レベル4のベースライン（停止・再試行・確認の条件を数値で定めること）が前提</td></tr>
 </tbody></table></div>
 
 ## 成熟度レベル
