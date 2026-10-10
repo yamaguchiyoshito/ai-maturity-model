@@ -19,13 +19,14 @@ type Model = {
   effects: Record<string, { task: string; project: string; handling: string }>
   effectRules: { coefficient: string; commit_level: number; commit: string }
 }
-type AxisRow = { id: string; name: string; cells: HTMLTableCellElement[] }
+type AxisRow = { id: string; name: string; cells: HTMLTableCellElement[]; states: Record<number, string> }
 const model = ref<Model | null>(null)
 const axisRows: AxisRow[] = []
 let stageCells: HTMLTableCellElement[] = []
 let stageRows: HTMLElement[] = []
 let levelRows: HTMLElement[] = []
 let axisLevelRows: HTMLElement[] = []
+const stageStates: Record<string, string> = {}
 const state = reactive<{ target: string; updated: string | null; levels: Record<string, number>; stage: string | null; ready: boolean }>({ target: '', updated: null, levels: {}, stage: null, ready: false })
 const copied = ref(false)
 const cleanups: (() => void)[] = []
@@ -100,12 +101,16 @@ onMounted(() => {
   load()
   // 軸別レベルの表は行＝レベル、列＝軸。軸ごとに縦一列のセルを集め、1列につき1セルを選ぶ
   for (const a of model.value.axes) {
-    const row: AxisRow = { id: a.id, name: a.name, cells: Array.from(document.querySelectorAll<HTMLTableCellElement>(`.mm-matrix-axes td.mm-cell[data-axis="${a.id}"]`)) }
+    const cells = Array.from(document.querySelectorAll<HTMLTableCellElement>(`.mm-matrix-axes td.mm-cell[data-axis="${a.id}"]`))
+    const states: Record<number, string> = {}
+    cells.forEach((td) => { states[Number(td.dataset.level)] = td.querySelector('.mm-state')?.textContent?.trim() ?? '' }) // Markdown 出力用に、各レベルの状態文を表から読む
+    const row: AxisRow = { id: a.id, name: a.name, cells, states }
     row.cells.forEach((td) => bind(td, () => selectAxis(row, Number(td.dataset.level))))
     axisRows.push(row); paintAxis(row)
   }
   axisLevelRows = Array.from(document.querySelectorAll<HTMLElement>('.mm-matrix-axes tbody tr[data-level]'))
   stageCells = Array.from(document.querySelectorAll<HTMLTableCellElement>('.mm-matrix-stages td.mm-stage-cell'))
+  stageCells.forEach((td) => { stageStates[td.dataset.stage!] = td.querySelector('.mm-state')?.textContent?.trim() ?? '' })
   stageCells.forEach((td) => bind(td, () => selectStage(td.dataset.stage!)))
   stageRows = Array.from(document.querySelectorAll<HTMLElement>('.mm-matrix-stages tbody tr[data-stage]'))
   levelRows = Array.from(document.querySelectorAll<HTMLElement>('.mm-matrix-levels tbody tr[data-level]'))
@@ -149,15 +154,15 @@ const updatedLabel = computed(() => {
 })
 const markdown = computed(() => {
   const lines = [`# AI利用成熟度 自己評価${state.target ? '：' + state.target : ''}`, '', `- 評価日：${(state.updated ?? new Date().toISOString()).slice(0, 10)}`, '- 種別：申告に基づく自己評価（証拠未確認。確定には評価の進め方の手順で証拠を確認する）', '']
-  lines.push('| 評価軸 | 自己評価 | 次のレベルへ |', '|---|---|---|')
+  lines.push('| 評価軸 | 自己評価 | 状態 |', '|---|---|---|')
   for (const r of rows.value) {
-    const nxt = r.level === null ? '—' : r.level >= 5 ? '最高レベル' : `レベル${r.level + 1} ${m.value.levels[String(r.level + 1)]}`
-    lines.push(`| ${r.name} | ${levelLabel(r.level)} | ${nxt} |`)
+    const st = r.level === null ? '—' : (axisRows.find((a) => a.id === r.id)?.states[r.level] ?? '')
+    lines.push(`| ${r.name} | ${levelLabel(r.level)} | ${st} |`)
   }
   lines.push('')
   lines.push(`- **PJのレベル**：${levelLabel(pjLevel.value)}${provisional.value && pjLevel.value !== null ? '（暫定。未選択の軸があります）' : ''}`)
   if (constraining.value.length) lines.push(`- **制約になっている軸**：${constraining.value.map((r) => r.name).join('、')}`)
-  lines.push(`- **自動化段階**：${stageLabel(state.stage)}`)
+  lines.push(`- **自動化段階**：${stageLabel(state.stage)}${state.stage !== null && stageStates[state.stage] ? '。' + stageStates[state.stage] : ''}`)
   if (control.value) lines.push(control.value.excess ? `- **統制状態**：統制不足。${state.stage} はレベル${control.value.need}以上を前提とするが、PJのレベルは${levelLabel(pjLevel.value)}` : `- **統制状態**：統制範囲内（自動化段階の上限 ${control.value.limit}）`)
   if (effect.value) lines.push(`- **見積もりに使える削減率の上限（目安）**：AI適用作業 ${effect.value.e.task}、案件全体 ${effect.value.e.project}（${effect.value.e.handling}）`)
   return lines.join('\n') + '\n'

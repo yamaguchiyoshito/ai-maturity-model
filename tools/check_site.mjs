@@ -97,7 +97,9 @@ try {
   await expect(page.locator('[data-testid="mm-pj-level"]')).toHaveText('レベル1 属人的');
   await expect(page.locator('.mm-matrix-axes td.mm-cell[data-axis="PRC"][data-level="1"]')).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('[data-testid="mm-markdown"]')).toContainText('販売管理PJ');
-  await expect(page.locator('[data-testid="mm-markdown"]')).toContainText('| AI前提の開発プロセス | レベル1 属人的 |');
+  await expect(page.locator('[data-testid="mm-markdown"]')).toContainText('| AI前提の開発プロセス | レベル1 属人的 | 個人が自分の作業順序を変えている。WBSと完了条件は従来のまま |');
+  await expect(page.locator('[data-testid="mm-markdown"]')).toContainText('自動化段階**：A1 手元で動かす。人が起動し、ローカルで実行・検証する');
+  await expect(page.locator('[data-testid="mm-markdown"]')).not.toContainText('次のレベルへ');
   await pick('PRC', 1); // 再クリックで解除され、暫定になる
   await expect(page.locator('[data-testid="mm-pj-level"]')).toHaveText('レベル2 プロセス確立');
   page.once('dialog', d => d.accept());
