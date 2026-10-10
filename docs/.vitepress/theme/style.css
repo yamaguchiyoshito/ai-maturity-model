@@ -21,24 +21,33 @@
 
 /* 成熟度マトリクス（docs/model/matrix.md、MatrixAssessment.vue） */
 .mm-matrix-wrap { overflow: auto; max-height: 82vh; margin: 16px 0 24px; border: 1px solid var(--vp-c-divider); border-radius: 8px; }
-.vp-doc .mm-matrix { display: table; width: max-content; min-width: 100%; margin: 0; border-collapse: separate; border-spacing: 0; font-size: 14px; line-height: 1.7; }
-.vp-doc .mm-matrix th, .vp-doc .mm-matrix td { vertical-align: top; min-width: 230px; max-width: 320px; padding: 10px 12px; border: 0; border-bottom: 1px solid var(--vp-c-divider); border-right: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); }
+.vp-doc .mm-matrix { display: table; width: 100%; margin: 0; border-collapse: separate; border-spacing: 0; font-size: 13.5px; line-height: 1.7; }
+.vp-doc .mm-matrix th, .vp-doc .mm-matrix td { vertical-align: top; min-width: 190px; padding: 10px 12px; border: 0; border-bottom: 1px solid var(--vp-c-divider); border-right: 1px solid var(--vp-c-divider); background: var(--vp-c-bg); }
+.vp-doc .mm-matrix .mm-col-narrow { min-width: 120px; width: 140px; }
 .vp-doc .mm-matrix tr:last-child td, .vp-doc .mm-matrix tr:last-child th { border-bottom: 0; }
 .vp-doc .mm-matrix thead th { position: sticky; top: 0; z-index: 2; background: var(--vp-c-bg-soft); text-align: left; font-weight: 700; }
-.vp-doc .mm-matrix tbody th { position: sticky; left: 0; z-index: 1; background: var(--vp-c-bg-soft); text-align: left; font-weight: 700; min-width: 170px; max-width: 220px; }
+.vp-doc .mm-matrix tbody th { position: sticky; left: 0; z-index: 1; background: var(--vp-c-bg-soft); text-align: left; font-weight: 700; }
+.vp-doc .mm-matrix .mm-row-head { min-width: 110px; width: 120px; }
 .vp-doc .mm-matrix thead th:first-child { left: 0; z-index: 3; }
 .vp-doc .mm-matrix tr:nth-child(2n) td { background: var(--vp-c-bg); }
 .mm-lv-name { display: block; font-weight: 400; font-size: 12px; color: var(--vp-c-text-2); }
 .mm-def { font-weight: 400; font-size: 12px; line-height: 1.6; color: var(--vp-c-text-2); margin-top: 4px; }
 .mm-sub { display: block; font-size: 12px; color: var(--vp-c-text-2); }
 .vp-doc .mm-matrix p { margin: 0; }
-.vp-doc .mm-matrix .mm-state { font-size: 14px; }
+.vp-doc .mm-matrix .mm-state { font-size: 13.5px; }
 .vp-doc .mm-matrix details { margin-top: 8px; font-size: 13px; color: var(--vp-c-text-2); }
 .vp-doc .mm-matrix summary { cursor: pointer; color: var(--vp-c-brand-1); font-size: 13px; }
 .vp-doc .mm-matrix details p { margin-top: 4px; }
-.mm-more { display: inline-block; margin-top: 8px; font-size: 12px; }
+.mm-foot { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; margin-top: 8px; }
+.vp-doc .mm-matrix .mm-foot details { margin-top: 0; }
+.vp-doc .mm-matrix .mm-foot details[open] { flex-basis: 100%; }
+.mm-more { display: inline-block; font-size: 12px; white-space: nowrap; }
+.vp-doc .mm-axis-help { font-size: 13px; color: var(--vp-c-text-2); margin: 0 0 8px; }
+.vp-doc .mm-axis-help summary { cursor: pointer; color: var(--vp-c-brand-1); }
+.vp-doc .mm-axis-help ul { margin: 6px 0 0; padding-left: 20px; }
+.vp-doc .mm-axis-help li { margin: 2px 0; }
 .mm-org-note { color: var(--vp-c-text-2); }
-.vp-doc .mm-matrix td.mm-org { background: repeating-linear-gradient(135deg, transparent 0 8px, var(--vp-c-bg-soft) 8px 10px); }
+.vp-doc .mm-matrix tr.mm-org td { background: repeating-linear-gradient(135deg, transparent 0 8px, var(--vp-c-bg-soft) 8px 10px); }
 .mm-cell { cursor: pointer; position: relative; transition: background-color .15s, box-shadow .15s; }
 .mm-cell:hover, .mm-cell:focus-visible { box-shadow: inset 0 0 0 2px var(--vp-c-brand-2); outline: none; }
 .mm-mark { display: none; font-size: 11px; font-weight: 700; color: var(--vp-c-white); background: var(--vp-c-brand-1); border-radius: 999px; padding: 1px 8px; margin-bottom: 6px; }
@@ -46,8 +55,10 @@
 .vp-doc .mm-matrix td.mm-cell.is-selected .mm-mark { display: inline-block; }
 .vp-doc .mm-matrix td.mm-cell.is-passed { background: var(--vp-c-bg-soft); }
 .vp-doc .mm-matrix td.mm-cell.is-passed .mm-state { color: var(--vp-c-text-2); }
-.vp-doc .mm-matrix td.is-current, .vp-doc .mm-matrix th.is-current { background: var(--vp-c-brand-soft); }
-.vp-doc .mm-matrix thead th.is-current { box-shadow: inset 0 -3px 0 var(--vp-c-brand-1); }
+.vp-doc .mm-matrix tr.is-current td { background: var(--vp-c-brand-soft); }
+.vp-doc .mm-matrix tr.is-current th { background: linear-gradient(var(--vp-c-brand-soft), var(--vp-c-brand-soft)), var(--vp-c-bg-soft); }
+.vp-doc .mm-matrix tr.is-current th.mm-row-head { box-shadow: inset 4px 0 0 var(--vp-c-brand-1); }
+.vp-doc .mm-matrix tr.is-current td.mm-cell.is-passed { background: var(--vp-c-brand-soft); }
 
 .mm-summary { margin: 24px 0 32px; padding: 20px 22px; border: 1px solid var(--vp-c-divider); border-radius: 10px; background: var(--vp-c-bg-soft); }
 .vp-doc .mm-summary-title { margin: 0 0 8px; padding: 0; border: 0; font-size: 1.15rem; }
@@ -84,8 +95,8 @@
 .mm-markdown { margin-top: 12px; font-size: 13px; }
 .mm-markdown pre { white-space: pre-wrap; word-break: break-word; font-size: 12px; background: var(--vp-c-bg); padding: 12px; border-radius: 6px; border: 1px solid var(--vp-c-divider); }
 @media (max-width: 639px) {
-  .vp-doc .mm-matrix th, .vp-doc .mm-matrix td { min-width: 200px; }
-  .vp-doc .mm-matrix tbody th { min-width: 130px; }
+  .vp-doc .mm-matrix th, .vp-doc .mm-matrix td { min-width: 180px; }
+  .vp-doc .mm-matrix .mm-row-head { min-width: 96px; }
   .mm-summary { padding: 14px; }
 }
 
