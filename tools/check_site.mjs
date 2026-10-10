@@ -77,8 +77,9 @@ try {
   await expect(page.locator('.VPSidebar').getByRole('link', { name: '成熟度マトリクス', exact: true })).toBeVisible();
   await expect(page.locator('.mm-matrix')).toHaveCount(3);
   await expect(page.locator('.mm-summary')).toBeVisible();
-  await expect(page.locator('.mm-matrix-axes tbody tr[data-axis]')).toHaveCount(5);
-  const pick = async (axis, level) => page.locator(`.mm-matrix-axes tr[data-axis="${axis}"] td.mm-cell[data-level="${level}"] .mm-state`).click(); // セル中央は折りたたみ見出しに当たりうるため、状態文を押す
+  await expect(page.locator('.mm-matrix-axes thead th[data-axis]')).toHaveCount(5);
+  await expect(page.locator('.mm-matrix-axes tbody tr[data-level]')).toHaveCount(6);
+  const pick = async (axis, level) => page.locator(`.mm-matrix-axes td.mm-cell[data-axis="${axis}"][data-level="${level}"] .mm-state`).click(); // セル中央は折りたたみ見出しに当たりうるため、状態文を押す
   await pick('SK', 2); await pick('ENV', 2); await pick('STD', 2); await pick('PRC', 1); await pick('EST', 2);
   await expect(page.locator('[data-testid="mm-pj-level"]')).toHaveText('レベル1 属人的');
   await expect(page.locator('[data-testid="mm-constraint"]')).toContainText('AI前提の開発プロセス');
@@ -88,11 +89,13 @@ try {
   await expect(page.locator('[data-testid="mm-control-excess"]')).toContainText('レベル3以上');
   await page.locator('.mm-matrix-stages td.mm-stage-cell[data-stage="A1"] .mm-state').click();
   await expect(page.locator('[data-testid="mm-control-ok"]')).toContainText('A1');
-  await expect(page.locator('.mm-matrix-levels thead th.is-current')).toHaveText(/レベル1/);
+  await expect(page.locator('.mm-matrix-levels tbody tr.is-current th')).toHaveText(/レベル1/);
+  await expect(page.locator('.mm-matrix-axes tbody tr.is-current th')).toHaveText(/レベル1/);
+  await expect(page.locator('.mm-matrix-stages tbody tr.is-current th')).toHaveText(/A1/);
   await page.locator('#mm-target').fill('販売管理PJ'); await page.locator('#mm-target').dispatchEvent('change');
   await page.reload();
   await expect(page.locator('[data-testid="mm-pj-level"]')).toHaveText('レベル1 属人的');
-  await expect(page.locator('.mm-matrix-axes tr[data-axis="PRC"] td.mm-cell[data-level="1"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.mm-matrix-axes td.mm-cell[data-axis="PRC"][data-level="1"]')).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('[data-testid="mm-markdown"]')).toContainText('販売管理PJ');
   await expect(page.locator('[data-testid="mm-markdown"]')).toContainText('| AI前提の開発プロセス | レベル1 属人的 |');
   await pick('PRC', 1); // 再クリックで解除され、暫定になる

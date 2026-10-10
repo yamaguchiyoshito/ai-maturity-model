@@ -3,7 +3,7 @@ import { onMounted, onBeforeUnmount, reactive, computed, ref } from 'vue'
 import { withBase } from 'vitepress'
 
 /**
- * 成熟度マトリクスの自己評価。軸ごとに1レベル、自動化段階を1つ選び、判定規則（PJのレベルは5軸の最小値、
+ * 成熟度マトリクスの自己評価。軸の列ごとに1レベル、自動化段階を1つ選び、判定規則（PJのレベルは5軸の最小値、
  * 自動化段階は前提レベルを超えると統制不足）を当てた結果をページ内で集計する。記録はこのブラウザの localStorage にだけ保存する。
  * 表の文面とモデルの数値は docs/model/matrix.md（criteria/model.json から生成）の data 属性から読む。
  */
@@ -23,8 +23,9 @@ type AxisRow = { id: string; name: string; cells: HTMLTableCellElement[] }
 const model = ref<Model | null>(null)
 const axisRows: AxisRow[] = []
 let stageCells: HTMLTableCellElement[] = []
-let stageColumns: HTMLElement[] = []
-let levelColumns: HTMLElement[] = []
+let stageRows: HTMLElement[] = []
+let levelRows: HTMLElement[] = []
+let axisLevelRows: HTMLElement[] = []
 const state = reactive<{ target: string; updated: string | null; levels: Record<string, number>; stage: string | null; ready: boolean }>({ target: '', updated: null, levels: {}, stage: null, ready: false })
 const copied = ref(false)
 const cleanups: (() => void)[] = []
@@ -62,11 +63,12 @@ function paintStage() {
     td.setAttribute('aria-pressed', on ? 'true' : 'false')
     td.classList.toggle('is-selected', on)
   })
-  stageColumns.forEach((el) => el.classList.toggle('is-current', state.stage !== null && el.dataset.stage === state.stage))
+  stageRows.forEach((el) => el.classList.toggle('is-current', state.stage !== null && el.dataset.stage === state.stage))
 }
 function paintLevel() {
   const lv = pjLevel.value
-  levelColumns.forEach((el) => el.classList.toggle('is-current', lv !== null && lv > 0 && Number(el.dataset.level) === lv))
+  levelRows.forEach((el) => el.classList.toggle('is-current', lv !== null && lv > 0 && Number(el.dataset.level) === lv))
+  axisLevelRows.forEach((el) => el.classList.toggle('is-current', lv !== null && Number(el.dataset.level) === lv))
 }
 function selectAxis(row: AxisRow, lv: number) {
   if (state.levels[row.id] === lv) delete state.levels[row.id]; else state.levels[row.id] = lv // 同じセルの再クリックで解除
@@ -96,15 +98,17 @@ onMounted(() => {
   try { model.value = JSON.parse(holder?.dataset.model || 'null') } catch { model.value = null }
   if (!model.value) return
   load()
-  for (const tr of Array.from(document.querySelectorAll<HTMLTableRowElement>('.mm-matrix-axes tbody tr[data-axis]'))) {
-    const row: AxisRow = { id: tr.dataset.axis!, name: tr.dataset.axisName || tr.dataset.axis!, cells: Array.from(tr.querySelectorAll<HTMLTableCellElement>('td.mm-cell')) }
+  // 軸別レベルの表は行＝レベル、列＝軸。軸ごとに縦一列のセルを集め、1列につき1セルを選ぶ
+  for (const a of model.value.axes) {
+    const row: AxisRow = { id: a.id, name: a.name, cells: Array.from(document.querySelectorAll<HTMLTableCellElement>(`.mm-matrix-axes td.mm-cell[data-axis="${a.id}"]`)) }
     row.cells.forEach((td) => bind(td, () => selectAxis(row, Number(td.dataset.level))))
     axisRows.push(row); paintAxis(row)
   }
+  axisLevelRows = Array.from(document.querySelectorAll<HTMLElement>('.mm-matrix-axes tbody tr[data-level]'))
   stageCells = Array.from(document.querySelectorAll<HTMLTableCellElement>('.mm-matrix-stages td.mm-stage-cell'))
   stageCells.forEach((td) => bind(td, () => selectStage(td.dataset.stage!)))
-  stageColumns = Array.from(document.querySelectorAll<HTMLElement>('.mm-matrix-stages [data-stage]'))
-  levelColumns = Array.from(document.querySelectorAll<HTMLElement>('.mm-matrix-levels [data-level]'))
+  stageRows = Array.from(document.querySelectorAll<HTMLElement>('.mm-matrix-stages tbody tr[data-stage]'))
+  levelRows = Array.from(document.querySelectorAll<HTMLElement>('.mm-matrix-levels tbody tr[data-level]'))
   paintStage(); paintLevel()
   state.ready = true
 })

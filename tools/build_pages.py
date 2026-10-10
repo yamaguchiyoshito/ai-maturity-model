@@ -112,29 +112,32 @@ def process_page(proc, p, order):
 
 MATRIX_INTRO = (
     "成熟度モデルの全体を一枚で見渡すための表です。[軸別ビュー](axes.md)、[レベル別ビュー](levels.md)、[自動化段階](automation.md)に分かれている定義を、"
-    "行に評価軸、列にレベルを取って並べ直しています。表は横にスクロールでき、見出し行と評価軸の列は固定されます。表が広いときは、左の目次の上にある「目次を閉じる」で本文の幅を広げられます。\n\n"
-    "表のセルを選ぶと、その軸の自己評価として記録され、下の集計に[判定規則](rules.md)（PJのレベルは5軸の最小値、自動化段階は前提レベルを超えると統制不足）を当てた結果が表示されます。"
-    "記録はこのブラウザのローカルストレージにだけ保存され、サーバーには送られません。\n\n"
+    "行にレベル、列に評価軸を取って並べ直しています。1行が「そのレベルのPJの姿」です。見出し行と行見出しの列は固定され、表が広いときは横にスクロールできます。"
+    "左の目次の上にある「目次を閉じる」で本文の幅を広げると、表全体が収まります。\n\n"
+    "表のセルを選ぶと、その軸の自己評価として記録され、上の集計に[判定規則](rules.md)（PJのレベルは5軸の最小値、自動化段階は前提レベルを超えると統制不足）を当てた結果が表示されます。"
+    "PJのレベルに当たる行は帯で強調されます。記録はこのブラウザのローカルストレージにだけ保存され、サーバーには送られません。\n\n"
     "**この集計は申告に基づく自己評価です。** 判定規則は自己申告だけでは充足としないため、確定には[評価の進め方](../assess/howto.md)の手順で証拠を確認してください。"
     "集計のMarkdownは[報告書の例](../assess/sample-report.md)の「軸別レベル」表と同じ形式で、評価下書きの出発点として使えます。\n\n"
 )
 
 
 def matrix_page(crit, model, order):
-    """成熟度マトリクス。軸×レベルの表（選択可能）、自動化段階の表（選択可能）、成熟度レベルの表（導出結果を強調）。"""
+    """成熟度マトリクス。行＝レベル（または段階）、列＝評価軸（または属性）。軸別レベルと自動化段階はセルを選べる。"""
     lv_keys = ["0", "1", "2", "3", "4", "5"]
     levels = model["levels"]
     stages = model["stages"]
     org = set(model["org_levels"])
     by_id = {c["id"]: c for c in crit["criteria"]}
-    counts = {(c["axis"], c["level"]): 0 for c in crit["criteria"]}
+    counts = {}
     for c in crit["criteria"]:
-        counts[(c["axis"], c["level"])] += 1
+        counts[(c["axis"], c["level"])] = counts.get((c["axis"], c["level"]), 0) + 1
 
-    def lv_head(k):
-        if k == "0":
-            return "<th scope=\"col\" data-level=\"0\">未到達</th>"
-        return f"<th scope=\"col\" data-level=\"{k}\">レベル{k}<br><span class=\"mm-lv-name\">{html(levels[k]['name'])}</span></th>"
+    def lv_label(k):
+        return "未到達" if k == "0" else f"レベル{k}"
+
+    def lv_row_head(k):
+        name = "" if k == "0" else f"<span class=\"mm-lv-name\">{html(levels[k]['name'])}</span>"
+        return f"<th scope=\"row\" class=\"mm-row-head\">{lv_label(k)}{name}</th>"
 
     data = {
         "levels": {k: v["name"] for k, v in levels.items()},
@@ -154,85 +157,75 @@ def matrix_page(crit, model, order):
     out += "<ClientOnly><MatrixAssessment /></ClientOnly>\n\n"
     out += f"<div class=\"mm-data\" data-model='{attr_json(data)}' hidden></div>\n\n"
 
-    # 1. 軸別レベル
+    # 1. 軸別レベル（行＝レベル、列＝軸）
     out += "## 軸別レベル\n\n"
-    out += "行が評価軸、列がレベルです。各セルの文は[軸別ビュー](axes.md)の「状態」と同じで、「具体例（架空PJ）」はセル内で開きます。架空PJは[はじめに](../guide/index.md)で設定した販売管理システム更改PJです。"
-    out += "「基準」のリンクは[軸別チェックリスト](../checklist/index.md)の該当レベルへ移動します。レベル4・5は、複数PJの実績によるベースラインが必要なため、PJ単独では判定しません。\n\n"
-    out += "<div class=\"mm-matrix-wrap\"><table class=\"mm-matrix mm-matrix-axes\" aria-label=\"軸別レベル\">\n"
-    out += "<thead><tr><th scope=\"col\">評価軸</th>" + "".join(lv_head(k) for k in lv_keys) + "</tr></thead>\n<tbody>\n"
+    out += "行がレベル、列が評価軸です。各セルの文は[軸別ビュー](axes.md)の「状態」と同じで、「具体例（架空PJ）」はセル内で開きます。架空PJは[はじめに](../guide/index.md)で設定した販売管理システム更改PJです。"
+    out += "「基準 n 件」は[軸別チェックリスト](../checklist/index.md)の該当レベルへ移動します。レベル4・5は、複数PJの実績によるベースラインが必要なため、PJ単独では判定しません。\n\n"
+    out += "<details class=\"mm-axis-help\"><summary>各軸が何を見るか</summary><ul>"
     for a in model["axes"]:
-        out += f"<tr data-axis=\"{a['id']}\" data-axis-name=\"{html(a['name'])}\">"
-        out += f"<th scope=\"row\" class=\"mm-axis\"><a href=\"axes.html#{anchor(a['anchor'])}\">{html(a['name'])}</a><div class=\"mm-def\">{html(a['plain'])}</div></th>"
-        for k in lv_keys:
-            cls = "mm-cell" + (" mm-org" if int(k) in org else "")
-            out += f"<td class=\"{cls}\" data-level=\"{k}\" role=\"button\" tabindex=\"0\" aria-pressed=\"false\" aria-label=\"{html(a['name'])} を {'未到達' if k == '0' else 'レベル' + k} として記録\">"
+        out += f"<li><a href=\"axes.html#{anchor(a['anchor'])}\">{html(a['name'])}</a>：{html(a['plain'])}</li>"
+    out += "</ul></details>\n\n"
+    out += "<div class=\"mm-matrix-wrap\"><table class=\"mm-matrix mm-matrix-axes\" aria-label=\"軸別レベル\">\n"
+    out += "<thead><tr><th scope=\"col\" class=\"mm-row-head\">レベル</th>"
+    for a in model["axes"]:
+        out += f"<th scope=\"col\" data-axis=\"{a['id']}\" title=\"{html(a['plain'])}\"><a href=\"axes.html#{anchor(a['anchor'])}\">{html(a['name'])}</a></th>"
+    out += "</tr></thead>\n<tbody>\n"
+    for k in lv_keys:
+        cls = " class=\"mm-org\"" if int(k) in org else ""
+        out += f"<tr data-level=\"{k}\"{cls}>" + lv_row_head(k)
+        for a in model["axes"]:
+            out += f"<td class=\"mm-cell\" data-axis=\"{a['id']}\" data-level=\"{k}\" role=\"button\" tabindex=\"0\" aria-pressed=\"false\" aria-label=\"{html(a['name'])} を {lv_label(k)} として記録\">"
             out += f"<span class=\"mm-mark\" aria-hidden=\"true\">選択中</span><p class=\"mm-state\">{html(a['states'][k])}</p>"
-            out += f"<details><summary>具体例（架空PJ）</summary><p>{html(a['examples'][k])}</p></details>"
+            out += f"<div class=\"mm-foot\"><details><summary>具体例（架空PJ）</summary><p>{html(a['examples'][k])}</p></details>"
             n = counts.get((a["id"], int(k)))
             if n:
                 out += f"<a class=\"mm-more\" href=\"../checklist/{a['checklist']}.html#{anchor('レベル' + k + '-' + levels[k]['name'])}\">基準 {n} 件</a>"
             elif int(k) in org:
                 out += "<span class=\"mm-more mm-org-note\">組織側の整備が到達条件</span>"
-            out += "</td>"
+            out += "</div></td>"
         out += "</tr>\n"
     out += "</tbody></table></div>\n\n"
 
-    # 2. 自動化段階
+    # 2. 自動化段階（行＝段階、列＝属性）
     out += "## 自動化段階\n\n"
-    out += "列が段階です。「状態」の行のセルを選ぶと、実行記録で確認できた最上位の段階として記録されます。各段階の定義と前提レベルは[自動化段階](automation.md)、必須基準は[自動化段階の判定基準](../checklist/automation.md)にあります。\n\n"
+    out += "行が段階です。「状態」のセルを選ぶと、実行記録で確認できた最上位の段階として記録されます。各段階の定義と前提レベルは[自動化段階](automation.md)、必須基準は[自動化段階の判定基準](../checklist/automation.md)にあります。\n\n"
     st_keys = ["0", "A1", "A2", "A3", "A4"]
     out += "<div class=\"mm-matrix-wrap\"><table class=\"mm-matrix mm-matrix-stages\" aria-label=\"自動化段階\">\n"
-    out += "<thead><tr><th scope=\"col\">項目</th>"
+    out += "<thead><tr><th scope=\"col\" class=\"mm-row-head\">段階</th><th scope=\"col\">状態</th><th scope=\"col\">具体例（架空PJ）</th><th scope=\"col\" class=\"mm-col-narrow\">前提とするレベル</th><th scope=\"col\">確認する基準</th></tr></thead>\n<tbody>\n"
     for k in st_keys:
         st = stages[k]
-        label = html(st["posture"]) if k == "0" else f"{k}<br><span class=\"mm-lv-name\">{html(st['posture'])}</span>"
-        out += f"<th scope=\"col\" data-stage=\"{k}\">{label}</th>"
-    out += "</tr></thead>\n<tbody>\n"
-    out += "<tr><th scope=\"row\">状態</th>"
-    for k in st_keys:
-        st = stages[k]
+        head = html(st["posture"]) if k == "0" else f"{k}<span class=\"mm-lv-name\">{html(st['posture'])}</span>"
         name = "自動化段階なし" if k == "0" else k
+        out += f"<tr data-stage=\"{k}\"><th scope=\"row\" class=\"mm-row-head\">{head}</th>"
         out += f"<td class=\"mm-cell mm-stage-cell\" data-stage=\"{k}\" role=\"button\" tabindex=\"0\" aria-pressed=\"false\" aria-label=\"自動化段階を {name} として記録\"><span class=\"mm-mark\" aria-hidden=\"true\">選択中</span><p class=\"mm-state\">{html(st['state'])}</p></td>"
-    out += "</tr>\n"
-    out += "<tr><th scope=\"row\">具体例（架空PJ）</th>" + "".join(f"<td data-stage=\"{k}\">{html(stages[k]['example'])}</td>" for k in st_keys) + "</tr>\n"
-    out += "<tr><th scope=\"row\">前提とするレベル</th>"
-    for k in st_keys:
-        st = stages[k]
-        txt = "—" if k == "0" else f"レベル{st['min_level']}<br><span class=\"mm-sub\">{html(st['reason'])}</span>"
-        out += f"<td data-stage=\"{k}\">{txt}</td>"
-    out += "</tr>\n"
-    out += "<tr><th scope=\"row\">確認する基準</th>"
-    for k in st_keys:
-        st = stages[k]
+        out += f"<td>{html(st['example'])}</td>"
+        pre = "—" if k == "0" else f"レベル{st['min_level']}<span class=\"mm-sub\">{html(st['reason'])}</span>"
+        out += f"<td class=\"mm-col-narrow\">{pre}</td>"
         if k == "0":
-            txt = "—"
+            req = "—"
         elif st["requires"]:
-            txt = "、".join(f"<a href=\"../checklist/automation.html\"><code>{cid}</code></a> {html(by_id[cid]['text'])}" for cid in st["requires"])
+            req = "<br>".join(f"<a href=\"../checklist/automation.html\"><code>{cid}</code></a> {html(by_id[cid]['text'])}" for cid in st["requires"])
         else:
-            txt = "本カタログでは判定しない。レベル4のベースライン（停止・再試行・確認の条件を数値で定めること）が前提"
-        out += f"<td data-stage=\"{k}\">{txt}</td>"
-    out += "</tr>\n"
+            req = "本カタログでは判定しない。レベル4のベースライン（停止・再試行・確認の条件を数値で定めること）が前提"
+        out += f"<td>{req}</td></tr>\n"
     out += "</tbody></table></div>\n\n"
 
-    # 3. 成熟度レベル
+    # 3. 成熟度レベル（行＝レベル、列＝属性）
     out += "## 成熟度レベル\n\n"
-    out += "列がPJのレベルです。この表は選択しません。上の軸別レベルで選んだ5軸の最小値が、PJのレベルとして強調表示されます。各欄は[レベル別ビュー](levels.md)と[効果の目安](../effect/estimate.md)と同じ内容です。\n\n"
+    out += "行がPJのレベルです。この表は選択しません。上の軸別レベルで選んだ5軸の最小値が、PJのレベルとして強調表示されます。各欄は[レベル別ビュー](levels.md)と[効果の目安](../effect/estimate.md)と同じ内容です。\n\n"
     pj_keys = ["1", "2", "3", "4", "5"]
     out += "<div class=\"mm-matrix-wrap\"><table class=\"mm-matrix mm-matrix-levels\" aria-label=\"成熟度レベル\">\n"
-    out += "<thead><tr><th scope=\"col\">項目</th>" + "".join(lv_head(k) for k in pj_keys) + "</tr></thead>\n<tbody>\n"
-    out += "<tr><th scope=\"row\">全体像</th>" + "".join(f"<td data-level=\"{k}\"><a href=\"levels.html#{anchor('レベル' + k + '-' + levels[k]['name'])}\">{html(levels[k]['summary'])}</a></td>" for k in pj_keys) + "</tr>\n"
-    out += "<tr><th scope=\"row\">自動化段階の上限</th>" + "".join(f"<td data-level=\"{k}\">{html(levels[k]['max_stage'])}</td>" for k in pj_keys) + "</tr>\n"
-    out += "<tr><th scope=\"row\">次のレベルへ上がる条件</th>"
+    out += "<thead><tr><th scope=\"col\" class=\"mm-row-head\">レベル</th><th scope=\"col\">全体像</th><th scope=\"col\" class=\"mm-col-narrow\">自動化段階の上限</th><th scope=\"col\">次のレベルへ上がる条件</th><th scope=\"col\" class=\"mm-col-narrow\">効果の目安<span class=\"mm-lv-name\">AI適用作業／案件全体の工数削減率</span></th><th scope=\"col\">具体例（架空PJ）</th></tr></thead>\n<tbody>\n"
     for k in pj_keys:
-        nxt = levels[k]["next"]
-        out += f"<td data-level=\"{k}\">{html(nxt) if nxt else '最高レベル。' + html(model['org_levels_note'])}</td>"
-    out += "</tr>\n"
-    out += "<tr><th scope=\"row\">効果の目安（AI適用作業の工数削減率／案件全体）</th>"
-    for k in pj_keys:
+        cls = " class=\"mm-org\"" if int(k) in org else ""
         e = model["effects"][k]
-        out += f"<td data-level=\"{k}\">{html(e['task'])}／{html(e['project'])}<br><span class=\"mm-sub\">{html(e['handling'])}</span></td>"
-    out += "</tr>\n"
-    out += "<tr><th scope=\"row\">具体例（架空PJ）</th>" + "".join(f"<td data-level=\"{k}\"><details><summary>開く</summary><p>{html(levels[k]['example'])}</p></details></td>" for k in pj_keys) + "</tr>\n"
+        nxt = levels[k]["next"]
+        out += f"<tr data-level=\"{k}\"{cls}>" + lv_row_head(k)
+        out += f"<td><a href=\"levels.html#{anchor('レベル' + k + '-' + levels[k]['name'])}\">{html(levels[k]['summary'])}</a></td>"
+        out += f"<td class=\"mm-col-narrow\">{html(levels[k]['max_stage'])}</td>"
+        out += f"<td>{html(nxt) if nxt else '最高レベル。' + html(model['org_levels_note'])}</td>"
+        out += f"<td class=\"mm-col-narrow\">{html(e['task'])}／{html(e['project'])}<span class=\"mm-sub\">{html(e['handling'])}</span></td>"
+        out += f"<td><details><summary>開く</summary><p>{html(levels[k]['example'])}</p></details></td></tr>\n"
     out += "</tbody></table></div>\n\n"
     out += "効果の目安は実績値ではなく初期仮説です。見積もりで使える削減率は、見積もり・PJ収支を除く4軸の最小レベルに対応する目安値を上限とします（[自動化段階](automation.md#見積もりとの関係)）。\n"
     return out
