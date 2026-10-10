@@ -188,10 +188,10 @@ def matrix_page(crit, model, order):
 
     # 2. 自動化段階（行＝段階、列＝属性）
     out += "## 自動化段階\n\n"
-    out += "行が段階です。「状態」のセルを選ぶと、実行記録で確認できた最上位の段階として記録されます。各段階の定義と前提レベルは[自動化段階](automation.md)、必須基準は[自動化段階の判定基準](../checklist/automation.md)にあります。\n\n"
+    out += "行が段階です。「状態」のセルを選ぶと、実行記録で確認できた最上位の段階として記録されます。各段階の定義は[自動化段階](automation.md)、必須基準は[自動化段階の判定基準](../checklist/automation.md)にあります。\n\n"
     st_keys = ["0", "A1", "A2", "A3", "A4"]
     out += "<div class=\"mm-matrix-wrap\"><table class=\"mm-matrix mm-matrix-stages\" aria-label=\"自動化段階\">\n"
-    out += "<thead><tr><th scope=\"col\" class=\"mm-row-head\">段階</th><th scope=\"col\">状態</th><th scope=\"col\">具体例（架空PJ）</th><th scope=\"col\" class=\"mm-col-narrow\">前提とするレベル</th><th scope=\"col\">確認する基準</th></tr></thead>\n<tbody>\n"
+    out += "<thead><tr><th scope=\"col\" class=\"mm-row-head\">段階</th><th scope=\"col\">状態</th><th scope=\"col\">具体例（架空PJ）</th><th scope=\"col\">確認する基準</th></tr></thead>\n<tbody>\n"
     for k in st_keys:
         st = stages[k]
         head = html(st["posture"]) if k == "0" else f"{k}<span class=\"mm-lv-name\">{html(st['posture'])}</span>"
@@ -199,8 +199,6 @@ def matrix_page(crit, model, order):
         out += f"<tr data-stage=\"{k}\"><th scope=\"row\" class=\"mm-row-head\">{head}</th>"
         out += f"<td class=\"mm-cell mm-stage-cell\" data-stage=\"{k}\" role=\"button\" tabindex=\"0\" aria-pressed=\"false\" aria-label=\"自動化段階を {name} として記録\"><span class=\"mm-mark\" aria-hidden=\"true\">選択中</span><p class=\"mm-state\">{html(st['state'])}</p></td>"
         out += f"<td>{html(st['example'])}</td>"
-        pre = "—" if k == "0" else f"レベル{st['min_level']}<span class=\"mm-sub\">{html(st['reason'])}</span>"
-        out += f"<td class=\"mm-col-narrow\">{pre}</td>"
         if k == "0":
             req = "—"
         elif st["requires"]:
