@@ -156,7 +156,7 @@ def matrix_page(crit, model, order):
 
     # 1. 軸別レベル
     out += "## 軸別レベル\n\n"
-    out += "行が評価軸、列がレベルです。各セルの文は[軸別ビュー](axes.md)の「状態」と同じで、「販売管理PJなら」はセル内で開きます。"
+    out += "行が評価軸、列がレベルです。各セルの文は[軸別ビュー](axes.md)の「状態」と同じで、「具体例（架空PJ）」はセル内で開きます。架空PJは[はじめに](../guide/index.md)で設定した販売管理システム更改PJです。"
     out += "「基準」のリンクは[軸別チェックリスト](../checklist/index.md)の該当レベルへ移動します。レベル4・5は、複数PJの実績によるベースラインが必要なため、PJ単独では判定しません。\n\n"
     out += "<div class=\"mm-matrix-wrap\"><table class=\"mm-matrix mm-matrix-axes\" aria-label=\"軸別レベル\">\n"
     out += "<thead><tr><th scope=\"col\">評価軸</th>" + "".join(lv_head(k) for k in lv_keys) + "</tr></thead>\n<tbody>\n"
@@ -167,7 +167,7 @@ def matrix_page(crit, model, order):
             cls = "mm-cell" + (" mm-org" if int(k) in org else "")
             out += f"<td class=\"{cls}\" data-level=\"{k}\" role=\"button\" tabindex=\"0\" aria-pressed=\"false\" aria-label=\"{html(a['name'])} を {'未到達' if k == '0' else 'レベル' + k} として記録\">"
             out += f"<span class=\"mm-mark\" aria-hidden=\"true\">選択中</span><p class=\"mm-state\">{html(a['states'][k])}</p>"
-            out += f"<details><summary>販売管理PJなら</summary><p>{html(a['examples'][k])}</p></details>"
+            out += f"<details><summary>具体例（架空PJ）</summary><p>{html(a['examples'][k])}</p></details>"
             n = counts.get((a["id"], int(k)))
             if n:
                 out += f"<a class=\"mm-more\" href=\"../checklist/{a['checklist']}.html#{anchor('レベル' + k + '-' + levels[k]['name'])}\">基準 {n} 件</a>"
@@ -194,7 +194,7 @@ def matrix_page(crit, model, order):
         name = "自動化段階なし" if k == "0" else k
         out += f"<td class=\"mm-cell mm-stage-cell\" data-stage=\"{k}\" role=\"button\" tabindex=\"0\" aria-pressed=\"false\" aria-label=\"自動化段階を {name} として記録\"><span class=\"mm-mark\" aria-hidden=\"true\">選択中</span><p class=\"mm-state\">{html(st['state'])}</p></td>"
     out += "</tr>\n"
-    out += "<tr><th scope=\"row\">販売管理PJなら</th>" + "".join(f"<td data-stage=\"{k}\">{html(stages[k]['example'])}</td>" for k in st_keys) + "</tr>\n"
+    out += "<tr><th scope=\"row\">具体例（架空PJ）</th>" + "".join(f"<td data-stage=\"{k}\">{html(stages[k]['example'])}</td>" for k in st_keys) + "</tr>\n"
     out += "<tr><th scope=\"row\">前提とするレベル</th>"
     for k in st_keys:
         st = stages[k]
@@ -232,7 +232,7 @@ def matrix_page(crit, model, order):
         e = model["effects"][k]
         out += f"<td data-level=\"{k}\">{html(e['task'])}／{html(e['project'])}<br><span class=\"mm-sub\">{html(e['handling'])}</span></td>"
     out += "</tr>\n"
-    out += "<tr><th scope=\"row\">販売管理PJなら</th>" + "".join(f"<td data-level=\"{k}\"><details><summary>開く</summary><p>{html(levels[k]['example'])}</p></details></td>" for k in pj_keys) + "</tr>\n"
+    out += "<tr><th scope=\"row\">具体例（架空PJ）</th>" + "".join(f"<td data-level=\"{k}\"><details><summary>開く</summary><p>{html(levels[k]['example'])}</p></details></td>" for k in pj_keys) + "</tr>\n"
     out += "</tbody></table></div>\n\n"
     out += "効果の目安は実績値ではなく初期仮説です。見積もりで使える削減率は、見積もり・PJ収支を除く4軸の最小レベルに対応する目安値を上限とします（[自動化段階](automation.md#見積もりとの関係)）。\n"
     return out
