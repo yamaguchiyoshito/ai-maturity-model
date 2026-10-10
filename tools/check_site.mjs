@@ -103,6 +103,21 @@ try {
   await expect(page.locator('.mm-matrix-axes td.mm-cell[aria-pressed="true"]')).toHaveCount(0);
   results.checks.push('maturity matrix: selection, PJ level = min of axes, control excess, persistence, reset');
 
+  // 左の目次の開閉：閉じると本文が広がり、再読み込み後も閉じたまま。開くと戻る
+  const contentWidth = () => page.locator('.VPDoc .content').first().evaluate(el => el.getBoundingClientRect().width);
+  const openWidth = await contentWidth();
+  await page.getByRole('button', { name: '目次を閉じる', exact: true }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-sidebar', 'closed');
+  await expect(page.locator('.VPSidebar .nav > .group').first()).toBeHidden();
+  const closedWidth = await contentWidth();
+  if (closedWidth <= openWidth + 100) throw Error(`Closing the sidebar should widen the content: ${openWidth} -> ${closedWidth}`);
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-sidebar', 'closed');
+  await page.getByRole('button', { name: '目次を開く', exact: true }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-sidebar', 'open');
+  await expect(page.locator('.VPSidebar').getByRole('link', { name: '成熟度マトリクス', exact: true })).toBeVisible();
+  results.checks.push('sidebar toggle: closes, widens content, persists across reload, reopens');
+
   await page.goto(url + 'process/');
   await expect(page.locator('.VPSidebar').getByRole('link', { name: '要件整理', exact: true })).toBeVisible();
   await page.locator('.VPSidebar').getByRole('link', { name: '要件整理', exact: true }).click();

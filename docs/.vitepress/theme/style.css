@@ -88,3 +88,26 @@
   .vp-doc .mm-matrix tbody th { min-width: 130px; }
   .mm-summary { padding: 14px; }
 }
+
+/* 左の目次：開く／閉じる（SidebarToggle.vue）。閉じると切替ボタンだけを残し、横長の表のために本文の幅を広げる。デスクトップ幅のみ。
+   VitePress は目次・本文・ローカルナビの位置を --vp-sidebar-width から計算するので、閉じた状態ではこの変数を 64px に切り替える。
+   上部ナビのサイトタイトルだけは元の幅（--ai-nav-title-width）を保ち、検索ボックスと重ならないようにする。 */
+:root { --ai-nav-title-width: 280px; }
+.sidebar-toggle { display: none; }
+@media (min-width: 960px) {
+  .sidebar-toggle { display: flex; align-items: center; gap: 8px; width: 100%; margin: 0 0 12px; padding: 4px 8px; border: 1px solid var(--vp-c-divider); border-radius: 6px; background: var(--vp-c-bg); color: var(--vp-c-text-2); font-size: 12px; line-height: 1.6; cursor: pointer; }
+  .sidebar-toggle:hover { border-color: var(--vp-c-brand-1); color: var(--vp-c-brand-1); }
+  .sidebar-toggle-icon { font-size: 16px; font-weight: 700; line-height: 1; }
+  html[data-sidebar="closed"] { --vp-sidebar-width: 64px; }
+  html[data-sidebar="closed"] .VPSidebar { padding-left: 12px; padding-right: 12px; }
+  html[data-sidebar="closed"] .VPSidebar .nav > .group { display: none; }
+  html[data-sidebar="closed"] .VPSidebar .sidebar-toggle { justify-content: center; width: 40px; height: 40px; padding: 0; }
+  html[data-sidebar="closed"] .VPSidebar .sidebar-toggle-text { display: none; }
+  html[data-sidebar="closed"] .VPNavBar.has-sidebar .title { width: var(--ai-nav-title-width); background-color: var(--vp-nav-bg-color); }
+  html[data-sidebar="closed"] .VPNavBar.has-sidebar .content, html[data-sidebar="closed"] .VPNavBar.has-sidebar .divider { padding-left: var(--ai-nav-title-width); }
+}
+@media (min-width: 1440px) {
+  html[data-sidebar="closed"] .VPSidebar { padding-left: max(12px, calc((100% - (var(--vp-layout-max-width) - 64px)) / 2)); }
+  html[data-sidebar="closed"] .VPNavBar.has-sidebar .title { width: calc((100% - (var(--vp-layout-max-width) - 64px)) / 2 + var(--ai-nav-title-width) - 32px); }
+  html[data-sidebar="closed"] .VPNavBar.has-sidebar .content, html[data-sidebar="closed"] .VPNavBar.has-sidebar .divider { padding-left: calc((100vw - var(--vp-layout-max-width)) / 2 + var(--ai-nav-title-width)); }
+}
