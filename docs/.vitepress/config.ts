@@ -57,7 +57,11 @@ export default defineConfig({
   cleanUrls: false,
   appearance: true,
   srcExclude: ['public/**'],
-  head: [['link', { rel: 'icon', type: 'image/svg+xml', href: `${base}assets/favicon.svg` }]],
+  head: [
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: `${base}assets/favicon.svg` }],
+    // 左の目次の開閉状態（SidebarToggle.vue が localStorage に保存）を、描画前に適用してちらつきを防ぐ
+    ['script', {}, "(()=>{try{document.documentElement.dataset.sidebar=localStorage.getItem('ai-maturity.sidebar')==='closed'?'closed':'open'}catch(e){}})()"]
+  ],
   ...(origin ? { sitemap: { hostname: origin + base } } : {}),
   markdown: { lineNumbers: false },
   themeConfig: {
